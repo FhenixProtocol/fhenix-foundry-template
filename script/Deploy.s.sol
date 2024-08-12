@@ -8,6 +8,6 @@ import { BaseScript } from "./Base.s.sol";
 /// @dev See the Solidity Scripting tutorial: https://book.getfoundry.sh/tutorials/solidity-scripting
 contract Deploy is BaseScript {
     function run() public broadcast returns (ExampleToken foo) {
-        foo = new ExampleToken("test", "TST", 10000);
+        foo = new ExampleToken("test", "TST", 10_000);
     }
 }

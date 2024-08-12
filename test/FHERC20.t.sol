@@ -5,7 +5,7 @@ import { Test } from "forge-std/src/Test.sol";
 import { console2 } from "forge-std/src/console2.sol";
 
 import { ExampleToken } from "../src/FHERC20.sol";
-import "../util/MockFheOps.sol";
+import { MockFheOps } from "../util/MockFheOps.sol";
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -18,12 +18,12 @@ contract FooTest is Test {
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
-        MockFheOps FHEOS = new MockFheOps();
-        bytes memory code = address(FHEOS).code;
+        MockFheOps fheos = new MockFheOps();
+        bytes memory code = address(fheos).code;
         vm.etch(address(128), code);
         // Instantiate the contract-under-test.
         console2.log(msg.sender);
-        foo = new ExampleToken("hello", "TST", 10000000);
+        foo = new ExampleToken("hello", "TST", 10_000_000);
     }
 
     /// @dev Basic test. Run it with `forge test -vvv` to see the console log.
@@ -32,9 +32,9 @@ contract FooTest is Test {
         console2.log(msg.sender);
         assertEq(0, foo.balanceOf(msg.sender));
 
-        uint256 to_mint = 1.0 * 10 ^ foo.decimals();
-        foo.mint(msg.sender, to_mint);
-        assertEq(foo.balanceOf(msg.sender), to_mint);
+        uint256 toMint = 1.0 * 10 ^ foo.decimals();
+        foo.mint(msg.sender, toMint);
+        assertEq(foo.balanceOf(msg.sender), toMint);
     }
 
     function test_Test() external {
@@ -42,8 +42,6 @@ contract FooTest is Test {
         uint256 result = foo.test(input);
         assertEq(result, input * 2);
     }
-
-
 
     // /// @dev Fuzz test that provides random values for an unsigned integer, but which rejects zero as an input.
     // /// If you need more sophisticated input validation, you should use the `bound` utility instead.

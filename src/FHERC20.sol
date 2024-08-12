@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.19;
 
 // import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-import "@fhenixprotocol/contracts/experimental/token/FHERC20/FHERC20.sol";
-import { FHE, euint128, inEuint128, inEuint32 } from "@fhenixprotocol/contracts/FHE.sol";
+import { FHERC20 } from "@fhenixprotocol/contracts/experimental/token/FHERC20/FHERC20.sol";
+import { FHE, euint128 } from "@fhenixprotocol/contracts/FHE.sol";
 import { AccessControl } from "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract ExampleToken is FHERC20, AccessControl {
@@ -26,19 +26,11 @@ contract ExampleToken is FHERC20, AccessControl {
     // }
 
     function test(uint256 input) public returns (uint256 result) {
-        euint128 encrypted = FHE.asEuint128(input) + FHE.asEuint128(input); 
+        euint128 encrypted = FHE.asEuint128(input) + FHE.asEuint128(input);
         return encrypted.decrypt();
     }
 
     function mint(address _address, uint256 _amount) public {
         _mint(_address, _amount);
-    }
-
-    function baseline() public {
-
-    }
-    
-    function passEncryptedInteger(inEuint32 memory encryptedInt) public {
-
     }
 }
