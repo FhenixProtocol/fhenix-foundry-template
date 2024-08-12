@@ -2,10 +2,13 @@
 pragma solidity >=0.8.25 <0.9.0;
 
 import { Test } from "forge-std/src/Test.sol";
-import { console2 } from "forge-std/src/console2.sol";
 
-import { ExampleToken } from "../src/FHERC20.sol";
+import { ExampleToken, FHERC20NotAuthorized } from "../src/FHERC20.sol";
 import { MockFheOps } from "../util/MockFheOps.sol";
+import { FheHelper } from "../util/FheHelper.sol";
+import { Permission, PermissionHelper } from "../util/PermissionHelper.sol";
+
+import { inEuint128, euint128 } from "@fhenixprotocol/contracts/FHE.sol";
 
 interface IERC20 {
     function balanceOf(address account) external view returns (uint256);
@@ -13,41 +16,104 @@ interface IERC20 {
 
 /// @dev If this is your first time with Forge, read this tutorial in the Foundry Book:
 /// https://book.getfoundry.sh/forge/writing-tests
-contract FooTest is Test {
-    ExampleToken internal foo;
+contract TokenTest is Test {
+    ExampleToken internal token;
+    PermissionHelper private permitHelper;
+
+    address public owner;
+    uint256 public ownerPrivateKey;
+
+    uint256 private receiverPrivateKey;
+    address private receiver;
+
+    Permission private permission;
+    Permission private permissionReceiver;
 
     /// @dev A function invoked before each test case is run.
     function setUp() public virtual {
+        // Required to mock FHE operations
+        // This is a mock contract that simulates FHE operations
+        // *****************************************************
         MockFheOps fheos = new MockFheOps();
         bytes memory code = address(fheos).code;
         vm.etch(address(128), code);
+        // *****************************************************
+
+        receiverPrivateKey = 0xB0B;
+        receiver = vm.addr(receiverPrivateKey);
+
+        ownerPrivateKey = 0xA11CE;
+        owner = vm.addr(ownerPrivateKey);
+
+        vm.startPrank(owner);
+
         // Instantiate the contract-under-test.
-        console2.log(msg.sender);
-        foo = new ExampleToken("hello", "TST", 10_000_000);
+        token = new ExampleToken("hello", "TST", 10_000_000);
+        permitHelper = new PermissionHelper(address(token));
+
+        permission = permitHelper.generatePermission(ownerPrivateKey, bytes32(0));
+        permissionReceiver = permitHelper.generatePermission(receiverPrivateKey, bytes32(0));
+
+        vm.stopPrank();
     }
 
-    /// @dev Basic test. Run it with `forge test -vvv` to see the console log.
-    function test_Example() external {
-        console2.log("Hello World");
-        console2.log(msg.sender);
-        assertEq(0, foo.balanceOf(msg.sender));
-
-        uint256 toMint = 1.0 * 10 ^ foo.decimals();
-        foo.mint(msg.sender, toMint);
-        assertEq(foo.balanceOf(msg.sender), toMint);
+    /// @dev Basic test for the balanceOf function of the plaintext ERC20.
+    function testBalanceOf() external {
+        assertEq(0, token.balanceOf(msg.sender));
+        uint256 toMint = 1.0 * 10 ^ token.decimals();
+        token.mint(msg.sender, toMint);
+        assertEq(token.balanceOf(msg.sender), toMint);
     }
 
-    function test_Test() external {
-        uint256 input = 10;
-        uint256 result = foo.test(input);
-        assertEq(result, input * 2);
+    // @dev Failing test for mintEncrypted function with unauthorized minter
+    function testMintEncryptedNoPermissions() public {
+        uint128 value = 50;
+        inEuint128 memory inputValue = FheHelper.encrypt128(value);
+
+        vm.expectRevert(FHERC20NotAuthorized.selector);
+        token.mintEncrypted(owner, inputValue);
     }
 
-    // /// @dev Fuzz test that provides random values for an unsigned integer, but which rejects zero as an input.
-    // /// If you need more sophisticated input validation, you should use the `bound` utility instead.
-    // /// See https://twitter.com/PaulRBerg/status/1622558791685242880
-    // function testFuzz_Example(uint256 x) external view {
-    //     vm.assume(x != 0); // or x = bound(x, 1, 100)
-    //     assertEq(foo.id(x), x, "value mismatch");
-    // }
+    // @dev Test mintEncrypted function with authorized minter
+    function testMintEncrypted() public {
+        uint128 value = 50;
+        inEuint128 memory encryptedValue = FheHelper.encrypt128(value);
+
+        vm.prank(owner);
+        token.mintEncrypted(owner, encryptedValue);
+
+        string memory encryptedBalance = token.balanceOfEncrypted(owner, permission);
+        uint256 balance = FheHelper.unseal(address(token), encryptedBalance);
+        assertEq(balance, uint256(value));
+    }
+
+    // @dev Test transferEncrypted function - tests reading and writing encrypted balances and using permissions
+    function testTransferEncrypted() public {
+        uint128 value = 50;
+        inEuint128 memory encryptedValue = FheHelper.encrypt128(value);
+
+        vm.startBroadcast(owner);
+
+        token.mintEncrypted(owner, encryptedValue);
+
+        string memory encryptedBalance = token.balanceOfEncrypted(owner, permission);
+        uint256 balance = FheHelper.unseal(address(token), encryptedBalance);
+        assertEq(balance, uint256(value));
+
+        uint128 transferValue = 10;
+
+        inEuint128 memory encryptedTransferValue = FheHelper.encrypt128(transferValue);
+        euint128 transferred = token.transferEncrypted(receiver, encryptedTransferValue);
+        assertEq(transferred.decrypt(), transferValue);
+
+        string memory encryptedBalanceAfterTransfer = token.balanceOfEncrypted(owner, permission);
+        uint256 balanceAfterTransfer = FheHelper.unseal(address(token), encryptedBalanceAfterTransfer);
+        assertEq(balanceAfterTransfer, uint256(value - transferValue));
+
+        string memory encryptedBalanceReceiver = token.balanceOfEncrypted(receiver, permissionReceiver);
+        uint256 balanceReceiver = FheHelper.unseal(address(token), encryptedBalanceReceiver);
+        assertEq(balanceReceiver, uint256(transferValue));
+
+        vm.stopBroadcast();
+    }
 }

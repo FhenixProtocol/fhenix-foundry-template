@@ -2,8 +2,8 @@
 pragma solidity >=0.8.19 <0.9.0;
 import { Test } from "forge-std/src/Test.sol";
 
-import {Permission} from "@fhenixprotocol/contracts/access/Permissioned.sol";
-import {MessageHashUtils} from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
+import { Permission } from "@fhenixprotocol/contracts/access/Permissioned.sol";
+import { MessageHashUtils } from "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 
 contract PermissionHelper is Test {
 
@@ -30,7 +30,7 @@ contract PermissionHelper is Test {
     }
 
 
-    function generatePermission(uint256 signerPrivateKey, bytes32 publicKey) public returns (Permission memory) {
+    function generatePermission(uint256 signerPrivateKey, bytes32 publicKey) public view returns (Permission memory) {
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
             keccak256("Permissioned(bytes32 publicKey)"),
             publicKey

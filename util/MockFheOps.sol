@@ -3,6 +3,9 @@ pragma solidity >=0.8.19 <0.9.0;
 library Precompiles {
     address public constant Fheos = address(128);
 }
+
+
+
 contract MockFheOps {
     /*
     FheUint8 = 0
@@ -70,6 +73,7 @@ contract MockFheOps {
 
         return result;
     }
+
     //For converting back to bytes
     function uint256ToBytes(uint256 value) public pure returns (bytes memory) {
         bytes memory result = new bytes(32);
@@ -81,10 +85,12 @@ contract MockFheOps {
         return result;
     }
     function boolToBytes(bool value) public pure returns (bytes memory) {
-        bytes memory result = new bytes(1); 
+        bytes memory result = new bytes(1);
 
-        assembly {
-            mstore(add(result, 32), mul(value, 0x01))
+        if (value) {
+            result[0] = 0x01;
+        } else {
+            result[0] = 0x00;
         }
 
         return result;
@@ -99,7 +105,7 @@ contract MockFheOps {
         uint8 value = uint8(b[0]);
         return value != 0;
     }
-    function trivialEncrypt(bytes memory input, uint8 toType, int32 securityZone) external pure returns (bytes memory) {
+    function trivialEncrypt(bytes memory input, uint8 toType, int32) external pure returns (bytes memory) {
         bytes32 result = bytes32(input);
         return bytes32ToBytes(result, toType);
     }
@@ -108,18 +114,19 @@ contract MockFheOps {
         return uint256ToBytes(result);
     }
 
-    function sealOutput(uint8 _utype, bytes memory ctHash, bytes memory _pk) external pure returns (string memory) {
+    function sealOutput(uint8, bytes memory ctHash, bytes memory) external pure returns (string memory) {
         return string(ctHash);
     }
-    function verify(uint8 _utype, bytes memory input, int32 _securityZone) external pure returns (bytes memory) {
+
+    function verify(uint8, bytes memory input, int32) external pure returns (bytes memory) {
         return input;
     }
-    function cast(uint8 _utype, bytes memory input, uint8 toType) external pure returns (bytes memory) {
+    function cast(uint8, bytes memory input, uint8 toType) external pure returns (bytes memory) {
         bytes32 result = bytes32(input);
         return bytes32ToBytes(result, toType);
     }
     function log(string memory s) external pure {}
-    function decrypt(uint8 _utype, bytes memory input) external pure returns (uint256) {
+    function decrypt(uint8, bytes memory input) external pure returns (uint256) {
         uint256 result = bytesToUint(input);
         return result;
     }
@@ -139,12 +146,12 @@ contract MockFheOps {
         bool result = (bytesToUint(lhsHash) % maxValue(utype)) < (bytesToUint(rhsHash) % maxValue(utype));
         return boolToBytes(result);
     }
-    function select(uint8 _utype, bytes memory controlHash, bytes memory ifTrueHash, bytes memory ifFalseHash) external pure returns (bytes memory)    {
+    function select(uint8, bytes memory controlHash, bytes memory ifTrueHash, bytes memory ifFalseHash) external pure returns (bytes memory)    {
         bool control = bytesToBool(controlHash);
         if (control) return ifTrueHash;
         return ifFalseHash;
     }
-    function req(uint8 _utype, bytes memory input) external pure returns (bytes memory)    {
+    function req(uint8, bytes memory input) external pure returns (bytes memory)    {
         return input;
     }
     function div(uint8 utype, bytes memory lhsHash, bytes memory rhsHash) external pure returns (bytes memory)    {
@@ -198,7 +205,7 @@ contract MockFheOps {
         }
         return rhsHash;
     }
-    function shl(uint8 utype, bytes memory lhsHash, bytes memory rhsHash) external pure returns (bytes memory)    {
+    function shl(uint8, bytes memory lhsHash, bytes memory rhsHash) external pure returns (bytes memory)    {
         uint256 lhs = bytesToUint(lhsHash);
         uint256 rhs = bytesToUint(rhsHash);
     
@@ -206,7 +213,7 @@ contract MockFheOps {
          
         return uint256ToBytes(result);
     }
-    function shr(uint8 utype, bytes memory lhsHash, bytes memory rhsHash) external pure returns (bytes memory)    {
+    function shr(uint8, bytes memory lhsHash, bytes memory rhsHash) external pure returns (bytes memory)    {
         uint256 lhs = bytesToUint(lhsHash);
         uint256 rhs = bytesToUint(rhsHash);
     
@@ -218,7 +225,7 @@ contract MockFheOps {
         bytes32 result = ~bytes32(value);
         return bytes32ToBytes(result, utype);
     }
-    function getNetworkPublicKey(int32 _securityZone) external pure returns (bytes memory)    {
+    function getNetworkPublicKey(int32) external pure returns (bytes memory)    {
         string memory x = "((-(-_(-_-)_-)-)) You've stepped into the wrong neighborhood pal.";
         return bytes(x);
     }
