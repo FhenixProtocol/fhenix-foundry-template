@@ -12,7 +12,15 @@ import {
     inEbool
 } from '@fhenixprotocol/contracts/FHE.sol';
 
-library FheHelper {
+import { Test } from "forge-std/src/Test.sol";
+import { MockFheOps } from "./MockFheOps.sol";
+
+contract FheEnabled is Test {
+    function initializeFhe() public {
+        MockFheOps fheos = new MockFheOps();
+        bytes memory code = address(fheos).code;
+        vm.etch(address(128), code);
+    }
 
     function unseal(address, string memory value) public pure returns (uint256) {
         bytes memory bytesValue = bytes(value);
