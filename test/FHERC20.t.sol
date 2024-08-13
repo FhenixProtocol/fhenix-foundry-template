@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity >=0.8.25 <0.9.0;
 
 import { Test } from "forge-std/src/Test.sol";
@@ -47,8 +47,8 @@ contract TokenTest is Test, FheEnabled {
         token = new ExampleToken("hello", "TST", 10_000_000);
         permitHelper = new PermissionHelper(address(token));
 
-        permission = permitHelper.generatePermission(ownerPrivateKey, bytes32(0));
-        permissionReceiver = permitHelper.generatePermission(receiverPrivateKey, bytes32(0));
+        permission = permitHelper.generatePermission(ownerPrivateKey);
+        permissionReceiver = permitHelper.generatePermission(receiverPrivateKey);
 
         vm.stopPrank();
     }

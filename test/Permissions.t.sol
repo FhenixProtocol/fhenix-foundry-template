@@ -25,7 +25,7 @@ contract PermissionedTest is Test {
         ownerPrivateKey = 0xA11CE;
         owner = vm.addr(ownerPrivateKey);
 
-        Permission memory permission = permitHelper.generatePermission(ownerPrivateKey, bytes32(0));
+        Permission memory permission = permitHelper.generatePermission(ownerPrivateKey);
 
         console2.log(owner);
 
@@ -41,6 +41,7 @@ contract PermissionedTestContract is Permissioned {
         Permission memory permission
     )
         public
+        view
         onlyPermitted(permission, owner)
         returns (uint256)
     {

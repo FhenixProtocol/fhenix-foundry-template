@@ -30,15 +30,15 @@ contract PermissionHelper is Test {
     }
 
 
-    function generatePermission(uint256 signerPrivateKey, bytes32 publicKey) public view returns (Permission memory) {
+    function generatePermission(uint256 signerPrivateKey) public view returns (Permission memory) {
         bytes32 digest = _hashTypedDataV4(keccak256(abi.encode(
             keccak256("Permissioned(bytes32 publicKey)"),
-            publicKey
+            bytes32(0)
         )));
 
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(signerPrivateKey, digest);
         bytes memory signature = bytes.concat(r, s, bytes1(v));
 
-        return Permission(publicKey, signature);
+        return Permission(bytes32(0), signature);
     }
 }

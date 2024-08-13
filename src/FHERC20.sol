@@ -1,7 +1,5 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
-
-// import { ERC20 } from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import { FHERC20 } from "@fhenixprotocol/contracts/experimental/token/FHERC20/FHERC20.sol";
 import { inEuint128 } from "@fhenixprotocol/contracts/FHE.sol";
