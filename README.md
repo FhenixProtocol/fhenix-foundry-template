@@ -9,24 +9,24 @@
 [license]: https://opensource.org/licenses/MIT
 [license-badge]: https://img.shields.io/badge/License-MIT-blue.svg
 
-A Foundry-based template for developing Solidity smart contracts, with sensible defaults.
+Fhenix provides a Foundry-based template for developing Solidity smart contracts and includes sensible defaults. Links
+are provided to specific topics for further exploration.
 
 ## What's Inside
 
-- [Forge](https://github.com/foundry-rs/foundry/blob/master/forge): compile, test, fuzz, format, and deploy smart
-  contracts
-- [Forge Std](https://github.com/foundry-rs/forge-std): collection of helpful contracts and utilities for testing
-- [Prettier](https://github.com/prettier/prettier): code formatter for non-Solidity files
-- [Solhint](https://github.com/protofire/solhint): linter for Solidity code
-- [PermissionHelper.sol](./util/PermissionHelper.sol): utilities for managing permissions related to FHE operations
-- [FheHelper.sol](./util/FheHelper.sol): utilities for mocking FHE operations
+- [Forge](https://github.com/foundry-rs/foundry/blob/master/forge): Tools to compile, test, fuzz, format, and deploy
+  smart contracts.
+- [Forge Std](https://github.com/foundry-rs/forge-std): A collection of helpful contracts and utilities for testing.
+- [Prettier](https://github.com/prettier/prettier): A code formatter for non-Solidity files.
+- [Solhint](https://github.com/protofire/solhint): A linter for Solidity code.
+- [PermissionHelper.sol](./util/PermissionHelper.sol): Utilities for managing permissions related to FHE operations.
+- [FheHelper.sol](./util/FheHelper.sol): Utilities for simulating FHE operations.
 
 ## Getting Started
 
-Click the [`Use this template`](https://github.com/fhenixprotocol/fhenix-foundry-template/generate) button at the top of
-the page to create a new repository with this repo as the initial state.
-
-Or, if you prefer to install the template manually:
+To create a new repository using this template, click the
+[`Use this template`](https://github.com/fhenixprotocol/fhenix-foundry-template/generate) button at the top of the page.
+Alternatively, install the template manually as follows:
 
 ```sh
 $ mkdir my-project
@@ -35,44 +35,45 @@ $ forge init --template fhenixprotocol/fhenix-foundry-template
 $ bun install # install Solhint, Prettier, and other Node.js deps
 ```
 
-If this is your first time with Foundry, check out the
-[installation](https://github.com/foundry-rs/foundry#installation) instructions.
+If this is your first time using Foundry, refer to the
+[installation](https://github.com/foundry-rs/foundry#installation) instructions for guidance.
 
 ## Features
 
-- Mock FHE Operations: All FHE operations, including encryption, decryption, and encrypted data handling, are mocked to
-  simulate their behavior in a network environment. This allows for seamless development and testing without requiring a
-  fully operational FHE network.
-
-- Permissions: The template provides utilities (PermissionHelper.sol) for creating permissions related to FHE
-  operations, allowing users to test that their contracts correctly implement access controlled actions such as viewing
-  balances of encrypted tokens. To read more about permissions, check out the
-  [Fhenix Documentation](https://docs.fhenix.zone/docs/devdocs/Writing%20Smart%20Contracts/Permissions) section.
+- Simulated FHE Operations: All FHE operations, including encryption, decryption, and encrypted data handling, are
+  simulated to replicate their behavior in a network environment. This approach facilitates seamless development and
+  testing without requiring a fully operational FHE network.
+- Permissions: The template includes utilities (PermissionHelper.sol) for creating permissions related to FHE
+  operations. These utilities enable users to test and verify that contracts correctly implement access-controlled
+  actions, such as viewing balances of encrypted tokens. For more about permissions, see the [Fhenix Documentation] https://docs.fhenix.zone/docs/devdocs/Writing%20Smart%20Contracts/Permissions)
+  section.
 
 ## Installing Dependencies
 
-This is how to install dependencies:
+Follow these steps to install dependencies:
 
-1. Install the dependency using your preferred package manager, e.g. `bun install dependency-name`
-   - Use this syntax to install from GitHub: `bun install github:username/repo-name`
-2. Add a remapping for the dependency in [remappings.txt](./remappings.txt), e.g.
+1. Install the dependency using your preferred package manager, for example: `bun install dependency-name`
+   - If installing from Github, use: `bun install github:username/repo-name`
+2. Add a remapping for the dependency in [remappings.txt](./remappings.txt), for example:
    `dependency-name=node_modules/dependency-name`
 
-Note that OpenZeppelin Contracts is pre-installed, so you can follow that as an example.
+Note that OpenZeppelin Contracts is pre-installed as an example.
 
 ## Writing Tests
 
-To write a new test contract, you start by importing `Test` from `forge-std`, and then you inherit it in your test
-contract. Forge Std comes with a pre-instantiated [cheatcodes](https://book.getfoundry.sh/cheatcodes/) environment
-accessible via the `vm` property. If you would like to view the logs in the terminal output, you can add the `-vvv` flag
-and use [console.log](https://book.getfoundry.sh/faq?highlight=console.log#how-do-i-use-consolelog).
+To write a new test contract:
 
-This template comes with an example test contract [FHERC20.t.sol](./test/FHERC20.t.sol)
+1. Start by importing `Test` from `forge-std`.
+2. Inherit the test contract.
 
-For contracts that wish to use FHE operations, you need to inject the FHE mock operations using the `FheEnabled`
-contract.
+Note that: Forge Std comes with a pre-instantiated [cheatcodes](https://book.getfoundry.sh/cheatcodes/) environment,
+which is accessible via the vm property. To view the logs in the terminal output, add the -vvv flag and use
+[console.log](https://book.getfoundry.sh/faq?highlight=console.log#how-do-i-use-consolelog).
 
-Simply inherit the `FheEnabled` contract in your test contract, and you will have access to the FHE operations.
+This template includes an example test contract [FHERC20.t.sol](./test/FHERC20.t.sol).
+
+For contracts utilizing FHE operations, insert FHE mock operations using the `FheEnabled` contract. By inheriting the
+`FheEnabled` contract in the test contract, you gain access to FHE operations. The following code demonstrates this.
 
 ```solidity
 import { FheEnabled } from "./util/FheHelper.sol";
@@ -82,7 +83,7 @@ contract MyTestContract is Test, FheEnabled {
 }
 ```
 
-Next, during the test setup, you need to initialize the FHE environment using the `initializeFhe` function.
+During test setup, `initializeFhe` the FHE environment using the initializeFhe function:
 
 ```solidity
 function setUp() public {
@@ -90,15 +91,16 @@ function setUp() public {
 }
 ```
 
-For a full example, including mocked encryption, decryption, sealing and permission usage refer to the example tests
-provided in the tests directory.
+For a complete example, including mocked encryption, decryption, sealing and permission usage, refer to the example
+**tests** provided in the tests directory.
 
 ## Permissions
 
-The PermissionHelper contract provides utilities for managing permissions related to FHE operations. This allows users
-to test that their contracts correctly implement access controlled actions such as viewing balances of encrypted tokens.
+The **PermissionHelper** contract provides utilities for managing permissions related to FHE operations. These utilities
+enable users to test and verify that contracts correctly implement access-controlled actions, such as viewing balances
+of encrypted tokens.
 
-Here's an example of how to use the PermissionHelper contract in a test contract:
+Consider using the following code as an example for a **PermissionHelper** contract in a test contract:
 
 ```solidity
 import { Test } from "forge-std/src/Test.sol";
@@ -133,40 +135,39 @@ contract MyContract is Test {
 }
 ```
 
-Note how the `PermissionHelper` contract is initialized only once we know the address of the contract being tested -
-this is because the permission generated by the `PermissionHelper` contract is tied to the address of the contract being
-tested.
+Note that the `PermissionHelper` contract is initialized only after we know the address of the contract being tested.
+The reason is that the permission generated by the `PermissionHelper` contract is tied to the address of the contract
+that is being tested.
 
 ## Differences from Real FHE Operations
 
-The FHE operations in this template are mocked to simulate the behavior of a real FHE network. This means that the
-operations are not actually performed on encrypted data, but rather on plaintext data. This allows for seamless
-development and testing without requiring a fully operational FHE network.
+FHE operations in this template simulate the behavior of a real FHE network. Instead of processing encrypted data,
+operations are performed on plaintext data, which enables seamless development and testing without the need for a fully
+operational FHE network. However, there are important differences between these mocked FHE operations and actual FHE
+operations:
 
-However, there are some key differences between the mocked FHE operations and real FHE operations:
-
-- Gas Costs - The gas costs for the mocked FHE operations are not representative of the gas costs for real FHE
-  operations. The gas costs for the mocked operations are based on the gas costs for the equivalent non-FHE operations.
-- Security Zones - The mocked FHE operations do not enforce security zones, so any user can perform operations between
-  ciphertexts which would otherwise fail.
-- Ciphertext Access - The mocked FHE operations do not enforce access control on ciphertexts, so any user can access any
-  mocked "ciphertext". On a real network such an operation could fail.
-- Decrypts during gas estimations - On Helium testnet or in Localfhenix when performing a decryption (or other revealing
-  operation) during gas estimation, the operation will return a default value, because the gas estimation does not have
-  access to the decrypted data. This can cause a transaction to fail during this phase if the decrypted data is used in
-  a way that would cause the transaction to revert (e.g. performing a require on it).
-- Security - The security of the mocked FHE operations is not representative of the security of real FHE operations. The
-  mocked operations do not provide any encryption/decryption.
-- Performance - The performance of the mocked FHE operations is not representative of the performance of real FHE
-  operations and will be much faster due to their nature.
+- Gas Costs – Gas costs associated with the mocked FHE operations do not accurately reflect those of real FHE
+  operations. Instead, they are based on gas costs of equivalent non-FHE operations.
+- Security Zones – In this mocked environment, security zones are not enforced. Thus, any user can perform operations
+  between ciphertexts, which would otherwise fail in a real FHE setting.
+- Ciphertext Access – The mocked FHE operations do not enforce access control restrictions on ciphertexts, which allows
+  any user to access any mocked "ciphertext." On a real network, such operations could fail.
+- Decrypts during Gas Estimations: When performing a decrypt (or other data revealing operations) during gas estimation
+  on the Helium testnet or Localfhenix, the operation returns a default value, as the gas estimation process does not
+  have access to the precise decrypted data. This can cause the transaction to fail at this stage, if the decrypted data
+  is used in a way that would trigger a transaction revert (e.g., when a require statement depends on it).
+- Security – The security provided by the mocked FHE operations does not represent the high level of security offered by
+  real FHE operations. The mocked operations do not involve actual encryption or decryption.
+- Performance – The performance of mocked FHE operations is not indicative of the real FHE operation speed. Mocked
+  operations will be significantly faster due to their simplified nature.
 
 ## Usage
 
-This is a list of the most frequently needed commands.
+The following list contains the most frequently used commands.
 
 ### Build
 
-Build the contracts:
+Compile and build the contracts:
 
 ```sh
 $ forge build
@@ -198,7 +199,7 @@ $ forge coverage
 
 ### Deploy
 
-**Note:** Anvil does not currently support FHE operations. Stay tuned for future updates for Anvil support.
+**Note:** Anvil does not currently support FHE operations. Stay tuned for future updates on Anvil support.
 
 Deploy to Anvil:
 
@@ -206,10 +207,10 @@ Deploy to Anvil:
 $ forge script script/Deploy.s.sol --broadcast --fork-url http://localhost:8545
 ```
 
-For this script to work, you need to have a `MNEMONIC` environment variable set to a valid
+For this script to work, it is necessary to have a MNEMONIC environment variable set to a valid
 [BIP39 mnemonic](https://iancoleman.io/bip39/).
 
-For instructions on how to deploy to a testnet or mainnet, check out the
+For instructions on how to deploy to a testnet or mainnet, refer to the
 [Solidity Scripting](https://book.getfoundry.sh/tutorials/solidity-scripting.html) tutorial.
 
 ### Format
@@ -222,7 +223,7 @@ $ forge fmt
 
 ### Gas Usage
 
-**Note:** Gas usage for FHE operations will be inaccurate due to the mocked nature of the operations. To see the
+**Note:** Gas usage for FHE operations will be inaccurate due to the mocked nature of these operations. To see the
 gas-per-operation for FHE operations, refer to the
 [Gas Costs](https://docs.fhenix.zone/docs/devdocs/Writing%20Smart%20Contracts/Gas-and-Benchmarks) section in our
 documentation.
@@ -255,7 +256,7 @@ Generate test coverage and output result to the terminal:
 $ bun run test:coverage
 ```
 
-Generate test coverage with lcov report (you'll have to open the `./coverage/index.html` file in your browser, to do so
+Generate test coverage with lcov report (you have to open the `./coverage/index.html` file in your browser, to do so
 simply copy paste the path):
 
 ```sh
@@ -267,4 +268,4 @@ $ bun run test:coverage:report
 - This project is licensed under MIT.
 - This project is based on the [Foundry Template](https://github.com/PaulRBerg/foundry-template)
 
-  Copyright (c) 2024 Paul Razvan Berg License (MIT) https://github.com/PaulRBerg/foundry-template/blob/main/LICENSE.md
+Copyright (c) 2024 Paul Razvan Berg License (MIT) https://github.com/PaulRBerg/foundry-template/blob/main/LICENSE.md
