@@ -33,7 +33,7 @@ jobs:
       - name: "Print prettier Summary"
         if: failure()
         run: |
-          bun run prettier --write --cache-location .cache/prettier || {
+          bun run prettier:write || {
             echo "[ERROR] Please apply the changes prettier suggests:"
             git diff --color=always; exit 1; 
           }
