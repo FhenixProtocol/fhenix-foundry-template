@@ -30,6 +30,14 @@ jobs:
       - name: "Lint the code"
         run: "bun run lint"
 
+      - name: "Print prettier Summary"
+        if: failure()
+        run: |
+          bun run prettier --write --cache-location .cache/prettier || {
+            echo "[ERROR] Please apply the changes prettier suggests:"
+            git diff --color=always; exit 1; 
+          }
+
       - name: "Add lint summary"
         run: |
           echo "## Lint result" >> $GITHUB_STEP_SUMMARY
